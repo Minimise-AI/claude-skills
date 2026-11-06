@@ -51,7 +51,7 @@ Look for `template.md` next to this file.
 2. Find the folder on this computer. It's usually under
    `~/Library/CloudStorage/GoogleDrive-<their email>/` on a Mac, inside `My Drive` or
    `Shared drives`. Confirm the path with them.
-3. For each video, run `scripts/look.sh "<video>" "<notes folder>"`. It saves a contact
+3. For each video, run `bash scripts/look.sh "<video>" "<notes folder>"`. It saves a contact
    sheet of 12 frames from across the video and, if Whisper is installed, a transcript.
    Look at the contact sheet and read the transcript. Keep the notes folder outside
    Drive, for example `~/drive-structure-notes/<client>/`.
