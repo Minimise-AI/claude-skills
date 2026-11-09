@@ -7,6 +7,7 @@ Free Claude Code skills for marketing agencies, from the videos we post.
 | Skill | What it does |
 |---|---|
 | [drive-structure](drive-structure/) | Sets up one clear Google Drive structure for every client's assets, so AI can find the right hooks, bodies, B-roll and images when it makes an ad. |
+| [design-system-creator](design-system-creator/) | Builds your brand on a Claude canvas first (mood board, your website split into its parts, a living style guide), then turns it into a design system Claude reads every time it designs for you. Start it with `/design-system-creator`. |
 
 ## How to install a skill
 

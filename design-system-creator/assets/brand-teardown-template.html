@@ -1,0 +1,687 @@
+<!--
+  BRAND TEARDOWN TEMPLATE
+  =======================
+  Fill every {{PLACEHOLDER}} with the brand's real, verified value, then delete
+  these instruction comments. This page is the review gate: the user approves it
+  (or corrects it token by token) BEFORE any design-system file is written.
+
+  THE DESIGN-FIRST RULE — the teardown SHOWS, it does not explain.
+  - Every token renders live: a swatch painted in the color, a heading set at the
+    real size, a box wearing the real radius and shadow, a button running the real
+    hover. If something can be shown visually, it gets no wall of text beside it.
+  - Text is captions: one or two short sentences, never paragraphs.
+  - Skip any section the brand has no data for. Delete the whole <section> — never
+    pad it with invented values. Tag uncertain values with the "unverified" chip.
+  - Never guess a brand value. A placeholder left unfilled is a question for the
+    user, not a license to invent.
+
+  SELF-CONTAINED: one file, all CSS inline. Fonts may load from Google Fonts when
+  the brand's faces are there; otherwise use the closest system stack and caption
+  it as a stand-in.
+-->
+<title>{{BRAND_NAME}} Brand Teardown</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Load the brand's real typefaces. Delete these three lines if the fonts are not on Google Fonts. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={{HEADING_FONT_QUERY}}&family={{BODY_FONT_QUERY}}&family={{MONO_FONT_QUERY}}&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== Surfaces & lines — the brand's real values, extracted or user-supplied ===== */
+    --paper:{{PAPER_HEX}};            /* default page canvas */
+    --paper-alt:{{PAPER_ALT_HEX}};    /* secondary canvas, if the brand has one — else delete and use --paper */
+    --surface:{{SURFACE_HEX}};        /* card / raised surface */
+    --line:{{LINE_HEX}};              /* dividers */
+    --line-soft:{{LINE_SOFT_HEX}};    /* dividers inside cards */
+    /* ===== Ink (text) scale — one entry per shade the brand actually uses ===== */
+    --ink:{{INK_HEX}};                /* primary text */
+    --ink-500:{{INK_500_HEX}};        /* secondary text */
+    --ink-400:{{INK_400_HEX}};        /* disabled / faint */
+    --ink-200:{{INK_200_HEX}};        /* hairlines, tracks */
+    --ink-100:{{INK_100_HEX}};        /* faint fills */
+    /* ===== Brand color(s) — the primary plus any tint/accent surfaces ===== */
+    --brand:{{BRAND_PRIMARY_HEX}};
+    --brand-strong:{{BRAND_STRONG_HEX}};   /* darker step that passes AA as text, if one exists */
+    --tint-1:{{TINT_1_HEX}};               /* tint surfaces: add/remove to match the brand's real set */
+    --tint-2:{{TINT_2_HEX}};
+    --tint-3:{{TINT_3_HEX}};
+    /* ===== Semantic feedback — only if the brand defines them; else delete ===== */
+    --ok-100:{{OK_BG_HEX}};   --ok-600:{{OK_TEXT_HEX}};
+    --warn-100:{{WARN_BG_HEX}}; --warn-600:{{WARN_TEXT_HEX}};
+    --bad-100:{{BAD_BG_HEX}};  --bad-600:{{BAD_TEXT_HEX}};
+    --info-100:{{INFO_BG_HEX}}; --info-600:{{INFO_TEXT_HEX}};
+    /* ===== Dark / secondary surface — ONLY if the brand has one (see section 09) ===== */
+    --dark-900:{{DARK_900_HEX}}; --dark-800:{{DARK_800_HEX}}; --dark-600:{{DARK_600_HEX}};
+    --dark-ink:{{DARK_INK_HEX}}; --dark-muted:{{DARK_MUTED_HEX}}; --dark-accent:{{DARK_ACCENT_HEX}};
+    /* ===== Type stacks — the brand's real families with honest fallbacks ===== */
+    --sans:'{{HEADING_FONT}}',ui-sans-serif,system-ui,sans-serif;
+    --ui:'{{BODY_FONT}}',ui-sans-serif,system-ui,sans-serif;
+    --mono:'{{MONO_FONT}}',ui-monospace,SFMono-Regular,Menlo,monospace;
+    /* ===== Shape & depth — the brand's measured values, not defaults ===== */
+    --radius-card:{{CARD_RADIUS}};         /* e.g. 12px */
+    --border-card:{{CARD_BORDER}};         /* e.g. 2px solid var(--ink) — or "1px solid var(--line)" or "none" */
+    --shadow-card:{{CARD_SHADOW}};         /* the brand's real elevation, e.g. "0 2px 8px rgba(0,0,0,.08)" */
+    --shadow-card-hover:{{CARD_SHADOW_HOVER}};
+    /* ===== Motion — only if measured or user-confirmed ===== */
+    --dur-sm:{{DURATION_SM}}; --ease-standard:{{EASE_STANDARD}};
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:30px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+  @media(max-width:720px){.wrap{padding:0 24px}}
+  section{padding-top:96px}
+  @media(max-width:720px){section{padding-top:64px}}
+  h1,h2,h3,h4{font-weight:700;text-wrap:balance}
+  h1{font-size:44px;line-height:50px;letter-spacing:-.025em}
+  @media(min-width:900px){h1{font-size:56px;line-height:60px;letter-spacing:-.03em}}
+  h2{font-size:32px;line-height:38px;letter-spacing:-.02em;margin-top:8px}
+  h3{font-size:24px;line-height:32px;letter-spacing:-.015em}
+  h4{font-size:20px;line-height:28px;font-weight:500}
+  p{max-width:680px}
+  .overline{font-size:11px;line-height:16px;letter-spacing:.08em;font-weight:700;text-transform:uppercase;color:var(--ink-500);font-family:var(--sans)}
+  .lead{margin-top:16px;color:var(--ink);font-size:18px;line-height:30px}
+  .note{font-size:14px;line-height:22px;color:var(--ink-500);max-width:680px}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;line-height:20px}
+  .card{background:var(--surface);border:var(--border-card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:24px}
+  .btn{display:inline-block;font-family:var(--sans);font-weight:500;font-size:16px;line-height:26px;padding:12px 24px;border:var(--border-card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);cursor:pointer;color:var(--ink);background:var(--brand)}
+  .btn.ghost{background:var(--paper)}
+  .btn:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  /* Grade chips: AAA / AA / warn / FAIL — used wherever a contrast ratio is shown. Keep all four. */
+  .chip{display:inline-block;font-family:var(--mono);font-size:12px;line-height:16px;font-weight:500;padding:4px 12px;border-radius:4px}
+  .chip.aaa{background:var(--ok-100);color:var(--ok-600)}
+  .chip.aa{background:var(--info-100);color:var(--info-600)}
+  .chip.warn{background:var(--warn-100);color:var(--warn-600)}
+  .chip.fail{background:var(--bad-100);color:var(--bad-600)}
+  .chip.plain{background:var(--ink-100);color:var(--ink)}
+  /* "unverified" tag — put it on any value extracted at low confidence. Never present a guess as fact. */
+  .chip.unverified{background:var(--warn-100);color:var(--warn-600)}
+  .tblwrap{overflow-x:auto;margin-top:32px;border:var(--border-card);border-radius:var(--radius-card);background:var(--surface);box-shadow:var(--shadow-card)}
+  table{border-collapse:collapse;width:100%;min-width:560px}
+  th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;text-align:left;color:var(--ink-500);padding:14px 20px;border-bottom:2px solid var(--ink)}
+  td{font-size:14px;line-height:22px;padding:12px 20px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.m{font-family:var(--mono);white-space:nowrap}
+  .grid{display:grid;gap:32px;margin-top:32px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .head-gap{margin-top:12px}
+  ul.rules{list-style:none;margin-top:24px;max-width:760px}
+  ul.rules li{padding:12px 0 12px 34px;border-bottom:1px solid var(--line);position:relative;font-size:16px;line-height:26px}
+  ul.rules li::before{content:"";position:absolute;left:0;top:19px;width:14px;height:14px;border:2px solid var(--ink);border-radius:4px;background:var(--brand)}
+  ul.rules.ban li::before{background:var(--bad-100);border-radius:999px}
+  .sw{border-radius:8px;border:1px solid var(--line);height:64px}
+  .swlab{margin-top:8px;font-family:var(--mono);font-size:12px;line-height:16px;color:var(--ink-500)}
+  .swlab b{display:block;color:var(--ink);font-weight:500}
+  .ramp{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px;margin-top:24px}
+  .icon{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;display:block}
+  .fchip{width:40px;height:40px;border-radius:var(--radius-card);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+  .toc{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+  .toc a{font-family:var(--mono);font-size:12px;line-height:16px;text-decoration:none;color:var(--ink);border:var(--border-card);border-radius:var(--radius-card);padding:6px 14px;background:var(--surface)}
+  .secnum{font-family:var(--mono);font-size:12px;color:var(--ink-500);letter-spacing:.08em}
+  .axes{margin-top:32px;max-width:680px;display:grid;gap:14px}
+  .axis{display:grid;grid-template-columns:110px 1fr 130px;gap:16px;align-items:center;font-size:14px;line-height:22px}
+  .axis .l{color:var(--ink-400);text-align:right}
+  .axis .r{font-weight:700}
+  .axis .track{height:2px;background:var(--ink-200);position:relative;border-radius:2px}
+  .axis .track i{position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;background:var(--ink);border-radius:999px}
+  .callout{margin-top:32px;border:var(--border-card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:24px;max-width:760px}
+  .callout.danger{background:var(--bad-100)}
+  .callout.info{background:var(--info-100)}
+  .callout.brand{background:var(--brand)}
+  .callout h4{margin-bottom:8px}
+  .callout p{font-size:16px;line-height:26px}
+  .typerow{display:grid;grid-template-columns:210px 1fr;gap:24px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--line)}
+  @media(max-width:720px){.typerow{grid-template-columns:1fr;gap:4px}}
+  .typerow .spec{font-family:var(--mono);font-size:12px;line-height:18px;color:var(--ink-500)}
+  .typerow .spec b{color:var(--ink);font-weight:500;display:block}
+  .dark{background:var(--dark-800);color:var(--dark-ink);font-family:var(--ui);border-radius:var(--radius-card);border:var(--border-card);box-shadow:var(--shadow-card);overflow:hidden}
+  .dark .inner{padding:32px}
+  .dark .dmuted{color:var(--dark-muted)}
+  .dark .dcard{background:var(--dark-900);border:1px solid var(--dark-600);border-radius:var(--radius-card);padding:20px}
+  .dark .daccent{color:var(--dark-accent)}
+  .spacebar{height:16px;background:var(--brand);border:var(--border-card);border-radius:4px}
+  .footer-gate{margin:96px 0 0;border-top:2px solid var(--ink);padding:64px 0 96px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;font-size:14px;line-height:22px;margin-top:16px}
+  .kv dt{font-family:var(--mono);font-size:12px;color:var(--ink-500);padding-top:2px;white-space:nowrap}
+  .kv dd{margin:0}
+  .proof{display:flex;flex-wrap:wrap;gap:32px;margin-top:32px}
+  .proof div{min-width:150px}
+  .proof .num{font-family:var(--mono);font-size:32px;line-height:38px;font-weight:500;font-variant-numeric:tabular-nums}
+  .proof .cap{font-size:12px;line-height:16px;color:var(--ink-500);margin-top:4px}
+  /* Hover demo — keep ONLY if the brand has a real interaction signature; otherwise delete .press and its demo card */
+  .press{transition:transform var(--dur-sm) var(--ease-standard),box-shadow var(--dur-sm) var(--ease-standard)}
+  .press:hover{box-shadow:var(--shadow-card-hover)}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+
+<!-- ============ Header ============
+     Logo (the brand's REAL file, pasted in — never redrawn), a file-count chip,
+     and the review-gate framing. -->
+<header class="wrap" style="padding-top:56px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+    <div style="height:36px">
+      <!-- {{LOGO_SVG}} — paste the brand's actual logo SVG inline here, height 36px.
+           If only a raster exists, use a small base64 <img>. If no logo exists yet,
+           set the brand name in the heading typeface instead. Never redraw or "improve" a logo. -->
+    </div>
+    <span class="chip plain">design-system/ &middot; {{FILE_COUNT}} files &middot; {{FOLDER_COUNT}} folders &middot; every value measured</span>
+  </div>
+  <div style="margin-top:72px">
+    <div class="overline">Design system review &middot; the gate before anything is finalized</div>
+    <h1 class="head-gap">The brand teardown</h1>
+    <p class="lead">Every token, rendered live. Review, then approve or correct at the end. <strong>Silence is not approval.</strong></p>
+    <!-- Contents chips: one per section that actually appears. Delete chips for sections you skipped. -->
+    <nav class="toc" aria-label="Sections">
+      <a href="#s1">01 Identity</a><a href="#s2">02 Logo</a><a href="#s3">03 Color</a><a href="#s4">04 Typography</a><a href="#s5">05 Iconography</a><a href="#s6">06 Shape &amp; depth</a><a href="#s7">07 Spacing</a><a href="#s8">08 Motion</a><a href="#s9">09 Dark surface</a><a href="#s10">10 Imagery</a><a href="#s11">11 Voice</a><a href="#s12">12 Hard rules</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ 01 Identity ============
+     Positioning axes (only axes the brand has actually taken a position on),
+     personality chips, and the signature headline device IF the brand has one.
+     No data for an element → delete that element. -->
+<section id="s1">
+  <div class="secnum">01 / 12</div>
+  <h2>Identity</h2>
+  <p class="lead">The promise: <em>{{BRAND_PROMISE_ONE_SENTENCE}}</em></p>
+  <div class="axes">
+    <!-- One .axis row per positioning axis. Position the dot with an inline style
+         on <i>, e.g. style="left:85%" (left pole = 0%, right pole = 100%). -->
+    <div class="axis"><span class="l">{{AXIS_1_LEFT}}</span><span class="track"><i style="left:{{AXIS_1_POSITION}}%"></i></span><span class="r">{{AXIS_1_RIGHT}}</span></div>
+    <div class="axis"><span class="l">{{AXIS_2_LEFT}}</span><span class="track"><i style="left:{{AXIS_2_POSITION}}%"></i></span><span class="r">{{AXIS_2_RIGHT}}</span></div>
+    <!-- ...repeat for each confirmed axis -->
+  </div>
+  <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+    <!-- One chip per personality trait, from the brand's own words or verified extraction -->
+    <span class="chip plain">{{TRAIT_1}}</span><span class="chip plain">{{TRAIT_2}}</span><span class="chip plain">{{TRAIT_3}}</span>
+  </div>
+  <!-- Signature headline device: ONLY if the brand has one (an emphasis treatment,
+       a highlight style, a recurring headline pattern). Render a real headline
+       from the brand wearing it. No device → delete this card. -->
+  <div class="card" style="margin-top:40px;max-width:760px;padding:32px">
+    <div class="overline">The canonical headline, with the signature device</div>
+    <h3 style="margin-top:16px;font-size:32px;line-height:1.5">{{HEADLINE_WITH_SIGNATURE_DEVICE_MARKUP}}</h3>
+    <p class="note" style="margin-top:16px">{{ONE_SENTENCE_DEVICE_RULE}}</p>
+  </div>
+</section>
+
+<!-- ============ 02 Logo ============
+     Construction geometry (only if measured from the real file), variants on
+     their grounds, the file inventory, clear space, and the never-list.
+     Every SVG here is the brand's real artwork. NEVER reconstruct geometry you
+     did not measure — a construction card with invented numbers is worse than none. -->
+<section id="s2">
+  <div class="secnum">02 / 12</div>
+  <h2>Logo</h2>
+  <p class="lead">{{LOGO_ONE_SENTENCE_DESCRIPTION}}</p>
+  <div class="grid g2">
+    <div class="card">
+      <div class="overline">Construction &middot; {{CONSTRUCTION_BOX}}</div>
+      <!-- The real mark at ~200px with measured construction guides (thin dashed
+           lines, dimension labels). Only include if you measured the geometry.
+           {{LOGO_CONSTRUCTION_SVG}} -->
+      <dl class="kv">
+        <!-- One row per measured fact: element → measurement. Examples of the KIND
+             of row (replace with this brand's real geometry):
+             <dt>mark</dt><dd>{{measured proportions}}</dd>
+             <dt>stroke</dt><dd>{{measured weight and ratio}}</dd> -->
+        <dt>{{GEOMETRY_KEY_1}}</dt><dd>{{GEOMETRY_VALUE_1}}</dd>
+        <dt>{{GEOMETRY_KEY_2}}</dt><dd>{{GEOMETRY_VALUE_2}}</dd>
+      </dl>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:16px">
+      <div class="overline">Variants on their grounds</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <!-- One tile per real variant, each on the ground it is meant for:
+             default on paper, inverse on ink/dark, any approved tinted ground.
+             Paste the real SVGs. Delete tiles for variants that do not exist. -->
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;justify-content:center"><!-- {{MARK_ON_PAPER_SVG}} --></div>
+        <div style="background:var(--ink);border-radius:8px;padding:18px;display:flex;justify-content:center"><!-- {{MARK_INVERSE_SVG}} --></div>
+      </div>
+      <p class="note">{{LOGO_COLOR_RULE_ONE_SENTENCE}}</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:32px;padding:32px;display:flex;flex-direction:column;gap:24px">
+    <div class="overline">The default lockup &middot; {{DEFAULT_LOCKUP_FILENAME}}</div>
+    <div style="height:52px"><!-- {{LOCKUP_SVG}} — the real lockup file, inline --></div>
+    <p class="note">{{LOCKUP_PROPORTION_CAPTION}}</p>
+  </div>
+  <!-- File inventory: one row per real logo file the system will contain -->
+  <div class="tblwrap"><table>
+    <tr><th>File</th><th>Use it when</th></tr>
+    <tr><td class="m">{{LOGO_FILE_1}}</td><td>{{LOGO_FILE_1_USE}}</td></tr>
+    <tr><td class="m">{{LOGO_FILE_2}}</td><td>{{LOGO_FILE_2_USE}}</td></tr>
+    <!-- ...one row per file -->
+  </table></div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="overline">Clear space &amp; minimums</div>
+      <dl class="kv">
+        <dt>clear space</dt><dd>{{CLEAR_SPACE_RULE}}</dd>
+        <dt>lockup min</dt><dd>{{LOCKUP_MIN_SIZE}}</dd>
+        <dt>mark min</dt><dd>{{MARK_MIN_SIZE}}</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="overline">Never</div>
+      <ul class="rules ban" style="margin-top:8px">
+        <!-- One li per real prohibition. Universal ones (no stretch/skew/recolor)
+             may stay; brand-specific ones come from the brand's own rules. -->
+        <li>No stretch, skew, rotation, mirror, or recolor</li>
+        <li>{{LOGO_BAN_2}}</li>
+        <li>{{LOGO_BAN_3}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 Color ============
+     Surface / ink / brand ramps as live swatches, tint or accent cards with
+     MEASURED contrast and a grade chip, semantic pairs, the worst-pairing
+     callout, and the full measured contrast table.
+     Every ratio is computed (WCAG relative luminance), never estimated. -->
+<section id="s3">
+  <div class="secnum">03 / 12</div>
+  <h2>Color</h2>
+  <p class="lead">{{COLOR_SYSTEM_ONE_SENTENCE}}</p>
+
+  <h3 style="margin-top:48px">Surfaces</h3>
+  <div class="ramp">
+    <!-- One swatch per surface value. Pattern:
+         <div><div class="sw" style="background:HEX"></div>
+              <div class="swlab"><b>name</b>HEX &middot; usage</div></div> -->
+    <div><div class="sw" style="background:{{PAPER_HEX}}"></div><div class="swlab"><b>paper</b>{{PAPER_HEX}} &middot; {{PAPER_USE}}</div></div>
+    <div><div class="sw" style="background:{{SURFACE_HEX}}"></div><div class="swlab"><b>surface</b>{{SURFACE_HEX}} &middot; {{SURFACE_USE}}</div></div>
+    <!-- ...loop every surface token -->
+  </div>
+
+  <h3 style="margin-top:48px">Ink scale</h3>
+  <div class="ramp">
+    <!-- One swatch per ink step actually in use; note roles and any accessibility
+         limits ("disabled only, fails AA") on the label -->
+    <div><div class="sw" style="background:{{INK_HEX}}"></div><div class="swlab"><b>ink</b>{{INK_HEX}} &middot; {{INK_USE}}</div></div>
+    <!-- ...loop every ink step -->
+  </div>
+
+  <h3 style="margin-top:48px">Brand ramp</h3>
+  <div class="ramp">
+    <!-- One swatch per step in the brand color's ramp. Outline the signature step:
+         style="background:HEX;border:2px solid var(--ink)" and mark it in the label. -->
+    <div><div class="sw" style="background:{{BRAND_PRIMARY_HEX}};border:2px solid var(--ink)"></div><div class="swlab"><b>{{BRAND_STEP_NAME}} &#9733;</b>{{BRAND_PRIMARY_HEX}} &middot; the signature</div></div>
+    <!-- ...loop the ramp -->
+  </div>
+  <!-- If the brand has a pairing rule for its primary (a border, a companion text
+       color), state it in one callout. No rule → delete. -->
+  <div class="callout brand">
+    <h4>{{PRIMARY_PAIRING_RULE_TITLE}}</h4>
+    <p>{{PRIMARY_PAIRING_RULE_ONE_SENTENCE}}</p>
+  </div>
+
+  <!-- Tint / accent surfaces, if the brand has them: one live card per tint, each
+       showing its hex, its measured contrast ratio against the ink that sits on
+       it, and a grade chip (AAA / AA / warn / FAIL). Delete if no tints. -->
+  <h3 style="margin-top:48px">Tint surfaces</h3>
+  <div class="grid g4">
+    <div style="background:{{TINT_1_HEX}};border:var(--border-card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:20px"><h4>{{TINT_1_NAME}}</h4><div class="mono" style="margin-top:4px">{{TINT_1_HEX}} &middot; {{TINT_1_RATIO}}:1</div><div style="margin-top:10px"><span class="chip aaa">{{TINT_1_GRADE}}</span></div></div>
+    <!-- ...one card per tint -->
+  </div>
+  <p class="note" style="margin-top:16px">{{TINT_USAGE_RULE_ONE_SENTENCE}}</p>
+
+  <!-- Semantic pairs, if defined: wash background + text color rendered live -->
+  <h3 style="margin-top:48px">Semantic pairs</h3>
+  <div class="grid g4">
+    <div style="background:var(--ok-100);border-radius:var(--radius-card);padding:16px 20px"><span style="color:var(--ok-600);font-weight:500;font-size:16px">Success</span><div class="mono" style="color:var(--ok-600);margin-top:4px">{{OK_BG_HEX}} / {{OK_TEXT_HEX}}</div></div>
+    <div style="background:var(--warn-100);border-radius:var(--radius-card);padding:16px 20px"><span style="color:var(--warn-600);font-weight:500;font-size:16px">Warn</span><div class="mono" style="color:var(--warn-600);margin-top:4px">{{WARN_BG_HEX}} / {{WARN_TEXT_HEX}}</div></div>
+    <div style="background:var(--bad-100);border-radius:var(--radius-card);padding:16px 20px"><span style="color:var(--bad-600);font-weight:500;font-size:16px">Danger</span><div class="mono" style="color:var(--bad-600);margin-top:4px">{{BAD_BG_HEX}} / {{BAD_TEXT_HEX}}</div></div>
+    <div style="background:var(--info-100);border-radius:var(--radius-card);padding:16px 20px"><span style="color:var(--info-600);font-weight:500;font-size:16px">Info</span><div class="mono" style="color:var(--info-600);margin-top:4px">{{INFO_BG_HEX}} / {{INFO_TEXT_HEX}}</div></div>
+  </div>
+
+  <!-- The worst-pairing callout: show the single most tempting FAILING combination
+       live (small sample, measured ratio, "failed"), so the user sees why it is
+       banned. Only if a real failing pair exists in the palette. -->
+  <div class="callout danger">
+    <h4>{{WORST_PAIRING_TITLE}}</h4>
+    <p><span style="background:{{WORST_PAIR_BG}};color:{{WORST_PAIR_FG}};padding:2px 10px;border-radius:4px;border:1px solid var(--line)">{{WORST_PAIR_LABEL}}</span> &mdash; <strong>{{WORST_PAIR_RATIO}}:1, failed.</strong> {{WORST_PAIR_RULE_ONE_SENTENCE}}</p>
+  </div>
+
+  <h3 style="margin-top:48px">Contrast &mdash; measured, do not recompute</h3>
+  <div class="tblwrap"><table>
+    <tr><th>Foreground</th><th>Background</th><th>Ratio</th><th>Grade</th></tr>
+    <!-- One row per pairing anyone will actually set: every text color on every
+         surface it may sit on. Chip classes: aaa / aa / warn / fail. -->
+    <tr><td class="m">{{FG_1}}</td><td class="m">{{BG_1}}</td><td class="m">{{RATIO_1}}</td><td><span class="chip aaa">AAA</span></td></tr>
+    <tr><td class="m">{{FG_2}}</td><td class="m">{{BG_2}}</td><td class="m">{{RATIO_2}}</td><td><span class="chip aa">AA</span></td></tr>
+    <tr><td class="m">{{FG_3}}</td><td class="m">{{BG_3}}</td><td class="m">{{RATIO_3}}</td><td><span class="chip fail">FAIL &middot; {{FAIL_SCOPE}}</span></td></tr>
+    <!-- ...full table -->
+  </table></div>
+</section>
+
+<!-- ============ 04 Typography ============
+     Typeface cards, the full scale rendered at TRUE size, the signature device
+     spec (if any), the brand's type rules, and context pairings. -->
+<section id="s4">
+  <div class="secnum">04 / 12</div>
+  <h2>Typography</h2>
+  <div class="grid g3">
+    <!-- One card per typeface in the system, each showing "Ag" at 44px in that
+         face plus a one-line role caption. Delete cards for faces that don't exist. -->
+    <div class="card"><div style="font-size:44px;line-height:50px;font-weight:700">Ag</div><h4 style="margin-top:12px">{{HEADING_FONT}}</h4><p class="note" style="margin-top:6px">{{HEADING_FONT_ROLE}}</p></div>
+    <div class="card"><div style="font-size:44px;line-height:50px;font-weight:600;font-family:var(--ui)">Ag</div><h4 style="margin-top:12px">{{BODY_FONT}}</h4><p class="note" style="margin-top:6px">{{BODY_FONT_ROLE}}</p></div>
+    <div class="card"><div style="font-size:44px;line-height:50px;font-weight:500;font-family:var(--mono)">01</div><h4 style="margin-top:12px">{{MONO_FONT}}</h4><p class="note" style="margin-top:6px">{{MONO_FONT_ROLE}}</p></div>
+  </div>
+  <!-- If a former typeface was retired, one danger callout naming it. Else delete. -->
+  <div class="callout danger" style="margin-top:32px">
+    <h4>{{RETIRED_FONT}} is retired</h4>
+    <p>Superseded. Do not reintroduce it anywhere.</p>
+  </div>
+
+  <h3 style="margin-top:48px">The scale, at true size</h3>
+  <div style="margin-top:8px;overflow-x:auto">
+    <!-- One .typerow per step, rendered at its REAL size/weight/spacing.
+         Spec column: name, size/line-height, weight, letter-spacing, usage.
+         Sample text: a short line in the brand's own voice — never lorem ipsum. -->
+    <div class="typerow"><div class="spec"><b>{{STEP_NAME}}</b>{{SIZE}} / {{LINE}} &middot; {{WEIGHT}} &middot; {{TRACKING}} &middot; {{STEP_USE}}</div><div style="font-size:{{SIZE}}px;line-height:{{LINE}}px;font-weight:{{WEIGHT}};letter-spacing:{{TRACKING}};white-space:nowrap">{{SAMPLE_LINE}}</div></div>
+    <!-- ...loop every step from display to caption/code -->
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="overline">Rules</div>
+      <ul class="rules" style="margin-top:8px">
+        <!-- One li per real type rule the brand follows (casing, max sizes per
+             composition, line length, emphasis policy, weight policy...) -->
+        <li>{{TYPE_RULE_1}}</li>
+        <li>{{TYPE_RULE_2}}</li>
+      </ul>
+    </div>
+    <!-- Signature device spec: exact construction of the brand's headline device
+         (padding, radius, wrapping behavior, quantity cap). Only if section 01
+         showed one; else delete this card. -->
+    <div class="card">
+      <div class="overline">Signature device spec</div>
+      <dl class="kv">
+        <dt>{{DEVICE_SPEC_KEY_1}}</dt><dd>{{DEVICE_SPEC_VALUE_1}}</dd>
+        <dt>{{DEVICE_SPEC_KEY_2}}</dt><dd>{{DEVICE_SPEC_VALUE_2}}</dd>
+      </dl>
+    </div>
+  </div>
+  <!-- Context pairings: which sizes go together on which surface -->
+  <div class="tblwrap"><table>
+    <tr><th>Context</th><th>Sizes</th></tr>
+    <tr><td>{{CONTEXT_1}}</td><td class="m">{{CONTEXT_1_SIZES}}</td></tr>
+    <tr><td>{{CONTEXT_2}}</td><td class="m">{{CONTEXT_2_SIZES}}</td></tr>
+    <!-- ...one row per surface the brand publishes to -->
+  </table></div>
+</section>
+
+<!-- ============ 05 Iconography ============
+     Live icon chips, the size table, and the bans. Skip the whole section if
+     the brand has no icon system and no data to state one. -->
+<section id="s5">
+  <div class="secnum">05 / 12</div>
+  <h2>Iconography</h2>
+  <p class="lead"><strong>{{ICON_LIBRARY}}, {{ICON_STYLE}}, {{ICON_STROKE}} stroke.</strong> That's the whole rule.</p>
+  <div class="card" style="margin-top:32px;padding:32px">
+    <div class="overline">Icon chips &middot; {{CHIP_SPEC_ONE_LINE}}</div>
+    <div style="display:flex;gap:24px;margin-top:20px;flex-wrap:wrap">
+      <!-- 4–6 real icons from the brand's library, rendered live inside chips on
+           the brand's chip grounds. Inline the actual SVG paths. -->
+      <div class="fchip" style="background:var(--tint-1)"><svg class="icon" viewBox="0 0 24 24"><!-- {{ICON_1_PATHS}} --></svg></div>
+      <div class="fchip" style="background:var(--tint-2)"><svg class="icon" viewBox="0 0 24 24"><!-- {{ICON_2_PATHS}} --></svg></div>
+    </div>
+    <p class="note" style="margin-top:20px">{{CHIP_GROUND_RULE_ONE_SENTENCE}}</p>
+  </div>
+  <div class="grid g2">
+    <div class="tblwrap" style="margin-top:32px"><table>
+      <tr><th>Context</th><th>Size</th></tr>
+      <tr><td>{{ICON_CONTEXT_1}}</td><td class="m">{{ICON_SIZE_1}}</td></tr>
+      <tr><td>{{ICON_CONTEXT_2}}</td><td class="m">{{ICON_SIZE_2}}</td></tr>
+      <!-- ...one row per context -->
+    </table></div>
+    <div class="card" style="margin-top:32px">
+      <div class="overline">Never</div>
+      <ul class="rules ban" style="margin-top:8px">
+        <li>{{ICON_BAN_1}}</li>
+        <li>{{ICON_BAN_2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 Shape & depth ============
+     Shadow and radius scales rendered live, plus a working hover demo IF the
+     brand has an interaction signature (a press, a lift, a color shift).
+     No signature → delete the demo card, keep the scales. -->
+<section id="s6">
+  <div class="secnum">06 / 12</div>
+  <h2>Shape &amp; depth</h2>
+  <p class="lead">{{SHAPE_SIGNATURE_ONE_SENTENCE}}</p>
+  <div class="grid g3">
+    <!-- One card per elevation level, each card WEARING its level's real shadow -->
+    <div class="card" style="box-shadow:{{SHADOW_LEVEL_1}}"><div class="overline">{{SHADOW_1_NAME}}</div><div class="mono" style="margin-top:8px">{{SHADOW_LEVEL_1}}</div><p class="note" style="margin-top:8px">{{SHADOW_1_USE}}</p></div>
+    <div class="card" style="box-shadow:{{SHADOW_LEVEL_2}}"><div class="overline">{{SHADOW_2_NAME}}</div><div class="mono" style="margin-top:8px">{{SHADOW_LEVEL_2}}</div><p class="note" style="margin-top:8px">{{SHADOW_2_USE}}</p></div>
+    <!-- ...one per level -->
+  </div>
+  <!-- Live hover demo — only when the brand has a real interaction signature -->
+  <div class="card" style="margin-top:32px;padding:32px">
+    <div class="overline">{{INTERACTION_SIGNATURE_NAME}} &mdash; the one motion unique to this brand. Try it</div>
+    <div style="display:flex;gap:24px;align-items:center;margin-top:20px;flex-wrap:wrap">
+      <button type="button" class="btn press">{{PRIMARY_CTA_LABEL}}</button>
+      <button type="button" class="btn ghost press">{{SECONDARY_CTA_LABEL}}</button>
+      <p class="note" style="flex:1;min-width:240px">{{INTERACTION_SPEC_ONE_SENTENCE}}</p>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="overline">Radius scale</div>
+      <div style="display:flex;gap:16px;margin-top:20px;flex-wrap:wrap;align-items:flex-end">
+        <!-- One box per radius step, corner rendered live. Highlight the default
+             step with the brand fill and a star. Pattern:
+             <div style="text-align:center">
+               <div style="width:56px;height:56px;border:var(--border-card);border-radius:VALUE;background:var(--paper)"></div>
+               <div class="mono" style="margin-top:6px">VALUE</div></div> -->
+        <div style="text-align:center"><div style="width:56px;height:56px;border:var(--border-card);border-radius:{{RADIUS_STEP_1}};background:var(--paper)"></div><div class="mono" style="margin-top:6px">{{RADIUS_STEP_1}}</div></div>
+        <div style="text-align:center"><div style="width:56px;height:56px;border:var(--border-card);border-radius:{{RADIUS_DEFAULT}};background:var(--brand)"></div><div class="mono" style="margin-top:6px">{{RADIUS_DEFAULT}} &#9733;</div></div>
+      </div>
+      <p class="note" style="margin-top:16px">{{RADIUS_RULES_ONE_SENTENCE}}</p>
+    </div>
+    <div class="card">
+      <div class="overline">Shadow rules</div>
+      <ul class="rules" style="margin-top:8px">
+        <li>{{SHADOW_RULE_1}}</li>
+        <li>{{SHADOW_RULE_2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 Spacing ============
+     Scale bars sized to each real step, plus the container widths. -->
+<section id="s7">
+  <div class="secnum">07 / 12</div>
+  <h2>Spacing &amp; layout</h2>
+  <p class="lead">{{SPACING_PHILOSOPHY_ONE_SENTENCE}}</p>
+  <div style="margin-top:32px;display:grid;gap:10px;max-width:680px">
+    <!-- One bar per step, the bar's width IS the step. Pattern:
+         <div style="display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:center">
+           <span class="mono">name · VALUE</span><div class="spacebar" style="width:VALUEpx"></div></div> -->
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:center"><span class="mono">{{SPACE_1_NAME}} &middot; {{SPACE_1}}</span><div class="spacebar" style="width:{{SPACE_1}}px"></div></div>
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:center"><span class="mono">{{SPACE_2_NAME}} &middot; {{SPACE_2}}</span><div class="spacebar" style="width:{{SPACE_2}}px"></div></div>
+    <!-- ...loop the scale -->
+  </div>
+  <div class="grid g2">
+    <div class="tblwrap"><table>
+      <tr><th>Container</th><th>Max width</th><th>For</th></tr>
+      <tr><td class="m">{{CONTAINER_1}}</td><td class="m">{{CONTAINER_1_WIDTH}}</td><td>{{CONTAINER_1_USE}}</td></tr>
+      <!-- ...one row per container -->
+    </table></div>
+    <div class="card">
+      <div class="overline">Section rhythm</div>
+      <dl class="kv">
+        <dt>{{RHYTHM_KEY_1}}</dt><dd>{{RHYTHM_VALUE_1}}</dd>
+        <dt>{{RHYTHM_KEY_2}}</dt><dd>{{RHYTHM_VALUE_2}}</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 Motion ============
+     Durations, easings, allowed vs banned. Skip the whole section when motion
+     was never measured or stated — do not write a default motion system here. -->
+<section id="s8">
+  <div class="secnum">08 / 12</div>
+  <h2>Motion</h2>
+  <p class="lead">{{MOTION_PHILOSOPHY_ONE_SENTENCE}}</p>
+  <div class="grid g2">
+    <div class="tblwrap"><table>
+      <tr><th>Token</th><th>Value</th><th>Use</th></tr>
+      <tr><td class="m">{{DUR_1_NAME}}</td><td class="m">{{DUR_1}}</td><td>{{DUR_1_USE}}</td></tr>
+      <!-- ...one row per duration token -->
+    </table></div>
+    <div class="card">
+      <div class="overline">Easing</div>
+      <dl class="kv">
+        <dt>{{EASE_1_NAME}}</dt><dd><span class="mono">{{EASE_1_VALUE}}</span> &mdash; {{EASE_1_USE}}</dd>
+      </dl>
+      <p class="note" style="margin-top:16px">Everything reduces to plain opacity under prefers-reduced-motion.</p>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="card" style="background:var(--ok-100)">
+      <div class="overline">Acceptable</div>
+      <ul class="rules" style="margin-top:8px">
+        <li>{{MOTION_ALLOWED_1}}</li>
+        <li>{{MOTION_ALLOWED_2}}</li>
+      </ul>
+    </div>
+    <div class="card" style="background:var(--bad-100)">
+      <div class="overline">Banned</div>
+      <ul class="rules ban" style="margin-top:8px">
+        <li>{{MOTION_BANNED_1}}</li>
+        <li>{{MOTION_BANNED_2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 Dark / secondary surface ============
+     ONLY if the brand has a second surface (a dark mode, a product theme, a
+     print variant). Render a small scoped demo panel wearing the surface's real
+     tokens. No second surface → delete this section AND its contents chip. -->
+<section id="s9">
+  <div class="secnum">09 / 12</div>
+  <h2>{{SECONDARY_SURFACE_NAME}}</h2>
+  <p class="lead">{{SECONDARY_SURFACE_SCOPE_ONE_SENTENCE}}</p>
+  <div class="dark" style="margin-top:32px">
+    <div class="inner">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <!-- {{MARK_INVERSE_SVG}} at 28px -->
+        <span style="font-weight:600;font-size:15px">{{SECONDARY_SURFACE_DEMO_TITLE}}</span>
+        <span class="dmuted" style="font-size:12px;margin-left:auto;font-family:var(--mono)">{{DARK_800_HEX}}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+        <!-- 2–3 small cards demoing the surface's real text, muted, and accent
+             colors on its real grounds. Use real content or visibly redacted
+             blocks (&#9608;) — never invented numbers. -->
+        <div class="dcard"><div class="dmuted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600">{{DEMO_STAT_LABEL}}</div><div class="daccent mono" style="font-size:28px;line-height:34px;margin-top:6px">{{DEMO_STAT_VALUE_OR_REDACTED}}</div></div>
+      </div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:16px">{{SECONDARY_SURFACE_BOUNDARY_RULE}}</p>
+</section>
+
+<!-- ============ 10 Imagery ============
+     The brand's real photography/illustration rules and its bans. Text stays in
+     short list items. No imagery direction on record → skip the section. -->
+<section id="s10">
+  <div class="secnum">10 / 12</div>
+  <h2>Imagery</h2>
+  <div class="grid g2">
+    <div class="card">
+      <div class="overline">{{IMAGERY_DO_TITLE}}</div>
+      <ul class="rules" style="margin-top:8px">
+        <li>{{IMAGERY_RULE_1}}</li>
+        <li>{{IMAGERY_RULE_2}}</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="overline">Never</div>
+      <ul class="rules ban" style="margin-top:8px">
+        <li>{{IMAGERY_BAN_1}}</li>
+        <li>{{IMAGERY_BAN_2}}</li>
+      </ul>
+    </div>
+  </div>
+  <!-- If the brand has texture/background patterns, render each live in its own
+       tile (paint the actual pattern as the tile background). Else delete. -->
+  <div class="grid g2">
+    <div style="border:var(--border-card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:24px;min-height:120px;background:{{PATTERN_1_CSS}}"><div class="overline">{{PATTERN_1_NAME}}</div><p class="note" style="margin-top:8px">{{PATTERN_1_RULE_ONE_SENTENCE}}</p></div>
+  </div>
+</section>
+
+<!-- ============ 11 Voice & vocabulary ============
+     Voice rules as short specimens, plus the brand's REAL proof numbers rendered
+     as stat blocks. Only verified numbers appear; an unverified one gets the
+     "unverified" chip or stays out. -->
+<section id="s11">
+  <div class="secnum">11 / 12</div>
+  <h2>Voice &amp; vocabulary</h2>
+  <p class="lead">{{VOICE_ONE_SENTENCE}}</p>
+  <div class="grid g2">
+    <div class="card">
+      <div class="overline">{{VOCAB_CARD_TITLE}}</div>
+      <p class="note" style="margin-top:12px"><strong>{{WORDS_TO_USE}}</strong> &mdash; not <strong>{{WORDS_TO_AVOID}}</strong>.</p>
+    </div>
+    <div class="card">
+      <div class="overline">{{HEADLINE_RECIPE_TITLE}}</div>
+      <ul class="rules" style="margin-top:8px">
+        <!-- 2–3 REAL headlines the brand has published, as specimens -->
+        <li>{{REAL_HEADLINE_EXAMPLE_1}}</li>
+        <li>{{REAL_HEADLINE_EXAMPLE_2}}</li>
+      </ul>
+    </div>
+  </div>
+  <!-- Proof numbers: one stat block per verified claim the brand makes about itself -->
+  <div class="proof">
+    <div><div class="num">{{PROOF_1_NUMBER}}</div><div class="cap">{{PROOF_1_LABEL}}</div></div>
+    <div><div class="num">{{PROOF_2_NUMBER}}</div><div class="cap">{{PROOF_2_LABEL}}</div></div>
+    <!-- ...one per verified number -->
+  </div>
+</section>
+
+<!-- ============ 12 Hard rules ============
+     A grid of banned cards: one card per non-negotiable, phrased as the ban plus
+     a one-sentence reason. Pull only rules that are real for THIS brand. -->
+<section id="s12">
+  <div class="secnum">12 / 12</div>
+  <h2>Hard rules</h2>
+  <p class="lead">Break one and the asset is off-brand, no matter how good it looks.</p>
+  <div class="grid g3">
+    <!-- One card per hard rule:
+         <div class="card" style="background:var(--bad-100)"><h4>BAN</h4>
+           <p class="note" style="margin-top:8px">one-sentence reason</p></div> -->
+    <div class="card" style="background:var(--bad-100)"><h4>{{HARD_RULE_1}}</h4><p class="note" style="margin-top:8px">{{HARD_RULE_1_REASON}}</p></div>
+    <div class="card" style="background:var(--bad-100)"><h4>{{HARD_RULE_2}}</h4><p class="note" style="margin-top:8px">{{HARD_RULE_2_REASON}}</p></div>
+    <!-- ...loop every hard rule -->
+  </div>
+</section>
+
+<!-- ============ Approval gate ============
+     Always the last block. The two buttons are framing, not functionality —
+     the user replies in chat. Keep "Silence is not approval" framing intact. -->
+<div class="footer-gate">
+  <div class="overline">The review gate</div>
+  <h2>Approve, or correct any token above</h2>
+  <p class="lead">Approve, and the design system is finalized &mdash; every other skill reads its brand from it. Corrections go token by token: section, value, fix.</p>
+  <div style="display:flex;gap:24px;margin-top:32px;flex-wrap:wrap">
+    <button type="button" class="btn press">Approve the design system</button>
+    <button type="button" class="btn ghost press">Request corrections</button>
+  </div>
+  <p class="note" style="margin-top:32px">Source: {{SOURCE_OF_TRUTH}} &middot; extraction rung {{RUNG}} &middot; {{DATE}} &middot; every value measured, none invented. <strong>Silence is not approval.</strong></p>
+</div>
+
+</main>
